@@ -85,7 +85,7 @@ export function formatCountdown(sendAt, now) {
  */
 export function sendsIn(sendAt, now) {
   const left = formatCountdown(sendAt, now);
-  return left === 'now' ? 'Sending now' : `Sends in ${left}`;
+  return left === 'now' ? '正在发送' : `剩余 ${left}`;
 }
 
 /** Default confirmation time = now + 5 minutes. */
@@ -233,7 +233,7 @@ export function createScheduledClientState({ fetchState, postSchedule, cancelSch
      * with its content intact (a failure rolls back and keeps the form).
      */
     async scheduleMessage(payload) {
-      if (!postSchedule) throw new Error('postSchedule is not configured');
+      if (!postSchedule) throw new Error('定时发送服务未就绪');
       const result = await postSchedule(payload);
       const task = result?.task ?? result;
       if (task?.id && own(task)) {

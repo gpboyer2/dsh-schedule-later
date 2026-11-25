@@ -83,9 +83,9 @@ function createClientPluginBody(React) {
     ]);
   }
 
-  /** Hourglass that turns over: "waiting to send". */
+  /** Hourglass that turns over: "等待发送". */
   /**
-   * "Are you sure?" for sending now and cancelling. A dimmed backdrop over the
+   * "确定吗？" for sending now and cancelling. A dimmed backdrop over the
    * whole window with one small card: what will happen, the message itself,
    * and two buttons — the safe one first. The backdrop or Esc (handled by the
    * component that shows it) dismisses it.
@@ -151,7 +151,7 @@ function createClientPluginBody(React) {
           }, p.preview)
         : null,
       h("div", { key: "ac", style: { display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 14 } }, [
-        btn("keep", p.keepLabel || "Keep it scheduled", p.onClose, false),
+        btn("keep", p.keepLabel || "保持定时", p.onClose, false),
         btn("go", p.confirmLabel, () => { p.onClose(); p.onConfirm(); }, true),
       ]),
     ]));
@@ -162,25 +162,25 @@ function createClientPluginBody(React) {
     const when = new Date(t.sendAt);
     const at = clock12(when);
     const time = at.h12 + ":" + at.mm + " " + at.ampm;
-    const where = chatTitle ? "“" + chatTitle + "”" : "its chat";
+    const where = chatTitle ? "“" + chatTitle + "”" : "所在对话";
     if (kind === "send") {
       return {
-        title: "Send this message now?",
-        note: "It goes into " + where + " right away, not at " + time + ", and the model will reply to it.",
+        title: "现在就发这条消息？",
+        note: "将发送到 " + where + " right away, not at " + time + ", and the model will reply to it.",
         // The button is red like Cancel: once sent it cannot be taken back.
         // The paper plane keeps the send time's colour — amber by day, blue by night.
-        preview: t.content, confirmLabel: "Send now", danger: true, icon: "send",
+        preview: t.content, confirmLabel: "立即发送", danger: true, icon: "send",
         iconTone: isDaytime(hourOf(when)) ? "day" : "night",
       };
     }
     return {
-      title: "Cancel this scheduled message?",
-      note: "It will not be sent at " + time + ". This can\u2019t be undone.",
-      preview: t.content, confirmLabel: "Cancel message", danger: true,
+      title: "取消这条定时消息？",
+      note: "不会在以下时间发送：" + time + "。此操作无法撤销。",
+      preview: t.content, confirmLabel: "取消消息", danger: true,
     };
   }
 
-  /** Paper plane: "Send now". */
+  /** Paper plane: "立即发送". */
   function SendGlyph(size) {
     return h("svg", {
       width: size, height: size, viewBox: "0 0 24 24", fill: "none",
@@ -192,7 +192,7 @@ function createClientPluginBody(React) {
     ]);
   }
 
-  /** Clock face: "Change time". */
+  /** Clock face: "修改时间". */
   function ClockGlyph(size) {
     return h("svg", {
       width: size, height: size, viewBox: "0 0 24 24", fill: "none",
@@ -265,15 +265,15 @@ function createClientPluginBody(React) {
   /** 12-hour clock parts. Always AM/PM, whatever the locale: that is the point. */
   function clock12(d) {
     const hour = d.getHours();
-    return { h12: hour % 12 || 12, mm: pad2(d.getMinutes()), ampm: hour < 12 ? "AM" : "PM" };
+    return { h12: hour % 12 || 12, mm: pad2(d.getMinutes()), ampm: hour < 12 ? "上午" : "下午" };
   }
 
   const PHASES = {
-    night: { label: "Night", top: "#0b1026", bottom: "#29346f" },
-    dawn: { label: "Early morning", top: "#6f7fd1", bottom: "#f7b58a" },
-    morning: { label: "Morning", top: "#4f9ee8", bottom: "#c3e4ff" },
-    afternoon: { label: "Afternoon", top: "#2f86db", bottom: "#a3d5ff" },
-    evening: { label: "Evening", top: "#5b3f8c", bottom: "#f08a5d" },
+    night: { label: "夜间", top: "#0b1026", bottom: "#29346f" },
+    dawn: { label: "凌晨", top: "#6f7fd1", bottom: "#f7b58a" },
+    morning: { label: "上午", top: "#4f9ee8", bottom: "#c3e4ff" },
+    afternoon: { label: "下午", top: "#2f86db", bottom: "#a3d5ff" },
+    evening: { label: "傍晚", top: "#5b3f8c", bottom: "#f08a5d" },
   };
 
   function phaseOf(hour) {
@@ -290,15 +290,15 @@ function createClientPluginBody(React) {
 
   function hourOf(d) { return d.getHours() + d.getMinutes() / 60; }
 
-  /** "Today · Wed 23 Sep", "Tomorrow · Thu 24 Sep", or just the date. */
+  /** "今天 · 9月23日 周三", "明天 · 9月24日 周四", or just the date. */
   function dayLine(ms, now) {
     const d = new Date(ms);
     const midnight = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
     const diff = Math.round((midnight(d) - midnight(new Date(now))) / 86_400_000);
     const date = d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
-    if (diff === 0) return "Today · " + date;
-    if (diff === 1) return "Tomorrow · " + date;
-    if (diff === -1) return "Yesterday · " + date;
+    if (diff === 0) return "今天 · " + date;
+    if (diff === 1) return "明天 · " + date;
+    if (diff === -1) return "昨天 · " + date;
     return date;
   }
 
@@ -335,14 +335,14 @@ function createClientPluginBody(React) {
     };
   }
 
-  /** "Today", "Tomorrow", a weekday within the week, else a short date. */
+  /** "今天", "明天", a weekday within the week, else a short date. */
   function shortDay(ms, now) {
     const d = new Date(ms);
     const midnight = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
     const diff = Math.round((midnight(d) - midnight(new Date(now))) / 86_400_000);
-    if (diff === 0) return "Today";
-    if (diff === 1) return "Tomorrow";
-    if (diff === -1) return "Yesterday";
+    if (diff === 0) return "今天";
+    if (diff === 1) return "明天";
+    if (diff === -1) return "昨天";
     if (diff > 1 && diff < 7) return d.toLocaleDateString(undefined, { weekday: "long" });
     return d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
   }
@@ -388,11 +388,11 @@ function createClientPluginBody(React) {
     ];
     const tonight = new Date(now);
     tonight.setHours(21, 0, 0, 0);
-    if (tonight.getTime() - now > 10 * 60_000) out.push({ key: "tonight", label: "Tonight 9 PM", at: tonight.getTime(), night: true });
+    if (tonight.getTime() - now > 10 * 60_000) out.push({ key: "tonight", label: "今晚 21:00", at: tonight.getTime(), night: true });
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(9, 0, 0, 0);
-    out.push({ key: "tomorrow", label: "Tomorrow 9 AM", at: tomorrow.getTime(), day: true });
+    out.push({ key: "tomorrow", label: "明天 9:00", at: tomorrow.getTime(), day: true });
     return out;
   }
 
@@ -531,7 +531,7 @@ function createClientPluginBody(React) {
         key: "ampm", x: 50, y: 75, textAnchor: "middle", fontSize: 12, fontWeight: 800,
         stroke: face, strokeWidth: 4, strokeLinejoin: "round",
         style: { fill: ink, paintOrder: "stroke", letterSpacing: ".5px", transition: "fill .6s, stroke .6s" },
-      }, hr < 12 ? "AM" : "PM"),
+      }, hr < 12 ? "上午" : "下午"),
     ]);
   }
 
@@ -624,7 +624,7 @@ function createClientPluginBody(React) {
       },
     }, glyph);
     return h("div", {
-      ref: boxRef, "data-time-column": p.id, title: "Scroll to change · click to pick",
+      ref: boxRef, "data-time-column": p.id, title: "滚动切换 · 点击选择",
       style: { position: "relative", display: "flex", flexDirection: "column", alignItems: "center" },
     }, [
       arrow(p.laterLabel, 1, "▲"),
@@ -777,8 +777,8 @@ function createClientPluginBody(React) {
     });
     const slider = h("div", { key: "slider", style: { marginTop: 12 } }, [
       h("div", {
-        key: "track", ref: trackRef, role: "slider", tabIndex: 0, title: "Drag, click or scroll",
-        "aria-label": "Time of day", "aria-valuemin": 0, "aria-valuemax": 1435, "aria-valuenow": minuteOfDay,
+        key: "track", ref: trackRef, role: "slider", tabIndex: 0, title: "拖动、点击或滚动",
+        "aria-label": "时段", "aria-valuemin": 0, "aria-valuemax": 1435, "aria-valuenow": minuteOfDay,
         "aria-valuetext": parts.h12 + ":" + parts.mm + " " + parts.ampm,
         onPointerDown: (e) => { e.currentTarget.setPointerCapture?.(e.pointerId); setFromPointer(e); },
         onPointerMove: (e) => { if (e.buttons & 1) setFromPointer(e); },
@@ -825,10 +825,10 @@ function createClientPluginBody(React) {
       },
     }, [
       h("div", { key: "head", style: { display: "flex", alignItems: "center", gap: 4, marginBottom: 6 } }, [
-        navBtn("Previous month", -1, atFirstMonth),
+        navBtn("上个月", -1, atFirstMonth),
         h("span", { key: "t", style: { flex: 1, textAlign: "center", fontWeight: 700, fontSize: 13 } },
           first.toLocaleDateString(undefined, { month: "long", year: "numeric" })),
-        navBtn("Next month", 1, false),
+        navBtn("下个月", 1, false),
       ]),
       h("div", { key: "wk", style: { display: "grid", gridTemplateColumns: "repeat(7, 1fr)", fontSize: 10, color: muted, textAlign: "center", marginBottom: 2 } },
         WEEKDAYS.map((w) => h("span", { key: w }, w))),
@@ -839,17 +839,17 @@ function createClientPluginBody(React) {
           (n) => shifted(value, 60 * n, now),
           hourOptions,
           (h12) => withParts(value, { hour: (h12 % 12) + (hour >= 12 ? 12 : 0) }, now),
-          "Hour", "One hour later", "One hour earlier"),
+          "时", "延后一小时", "提前一小时"),
         h("span", { key: "colon", style: { fontSize: 22, fontWeight: 700, opacity: 0.5 } }, ":"),
         column("mm", parts.mm,
           (n) => minuteSteps(n),
           minuteOptions,
           (m) => withParts(value, { minute: m }, now),
-          "Minute", "Five minutes later", "Five minutes earlier"),
+          "分", "延后五分钟", "提前五分钟"),
         h("div", {
           key: "ampm",
           style: { display: "flex", flexDirection: "column", marginLeft: 6, borderRadius: 8, overflow: "hidden", border: "1px solid " + hairline },
-        }, [half("AM", false), half("PM", true)]),
+        }, [half("上午", false), half("下午", true)]),
       ]),
       slider,
     ]);
@@ -935,9 +935,9 @@ function createClientPluginBody(React) {
     const submit = async () => {
       if (busy) return;
       const content = String(msg ?? "");
-      if (!content.trim()) { setError("The message is empty — type what to send first"); return; }
+      if (!content.trim()) { setError("消息为空——请先输入要发送的内容"); return; }
       const at = parseLocal(timeValue);
-      if (!Number.isFinite(at) || at <= Date.now()) { setError("The send time must be in the future"); return; }
+      if (!Number.isFinite(at) || at <= Date.now()) { setError("发送时间必须在未来"); return; }
       setBusy(true);
       setError(null);
       try {
@@ -1005,7 +1005,7 @@ function createClientPluginBody(React) {
                 parts.h12 + ":" + parts.mm),
               h("span", {
                 key: "ap",
-                title: day ? "Daytime" : "Night-time",
+                title: day ? "白天" : "夜间",
                 style: {
                   display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 999,
                   fontSize: 11, fontWeight: 700, letterSpacing: ".5px",
@@ -1015,14 +1015,14 @@ function createClientPluginBody(React) {
                 },
               }, [day ? SunGlyph(12) : MoonGlyph(12), h("span", { key: "t" }, parts.ampm)]),
             ])
-          : h("div", { key: "big", style: { fontSize: 14, color: muted } }, "Pick a time"),
+          : h("div", { key: "big", style: { fontSize: 14, color: muted } }, "选择时间"),
         when ? h("div", { key: "day", style: { color: muted } }, dayLine(at, now)) : null,
         when
           ? h("div", {
               key: "in",
               style: { display: "inline-flex", alignItems: "center", gap: 5, fontWeight: 600, color: past ? "#dc2626" : "#3b82f6" },
             }, past
-              ? "That time has already passed"
+              ? "该时间已经过去"
               : [HourglassIcon(12), h("span", { key: "t" }, sendsIn(at, now))])
           : null,
       ]),
@@ -1049,12 +1049,12 @@ function createClientPluginBody(React) {
       key: "msg", style: { display: "flex", flexDirection: "column", gap: 4, flex: side ? 1 : "none", minHeight: 0 },
     }, [
       h("div", { key: "l", style: { display: "flex", alignItems: "baseline", gap: 8, fontSize: 11, color: muted } }, [
-        h("span", { key: "a" }, "Message"),
-        canSync ? h("span", { key: "b", style: { marginLeft: "auto", fontSize: 10 } }, "same as the message box") : null,
+        h("span", { key: "a" }, "消息"),
+        canSync ? h("span", { key: "b", style: { marginLeft: "auto", fontSize: 10 } }, "与输入框一致") : null,
       ]),
       h("textarea", {
-        key: "t", value: msg, rows: side ? 5 : 3, "aria-label": "Message to send later",
-        placeholder: "Type what to send later…",
+        key: "t", value: msg, rows: side ? 5 : 3, "aria-label": "稍后发送的消息",
+        placeholder: "输入稍后要发送的内容…",
         autoFocus: !String(msg).trim(),
         onChange: (e) => editMsg(e?.target?.value ?? ""),
         onKeyDown: (e) => {
@@ -1081,7 +1081,7 @@ function createClientPluginBody(React) {
             ...(mobile ? { minHeight: TOUCH_MIN } : {}),
           },
         }, [
-          h("span", { key: "l" }, "Change date & time"),
+          h("span", { key: "l" }, "修改日期和时间"),
           h("span", { key: "c", style: { marginLeft: "auto", opacity: 0.6 } }, pickerOpen ? "▴" : "▾"),
         ]);
 
@@ -1089,11 +1089,11 @@ function createClientPluginBody(React) {
       h("button", {
         key: "ok", type: "button", disabled: busy, onClick: submit,
         style: actionBtn({ border: "none", fontWeight: 600, color: "#fff", background: "#3b82f6", opacity: busy ? .6 : 1, cursor: busy ? "wait" : "pointer" }),
-      }, busy ? "Scheduling…" : "Confirm"),
+      }, busy ? "正在定时…" : "确认"),
       h("button", {
         key: "no", type: "button", onClick: () => setOpen(false),
         style: actionBtn({ border: "1px solid " + field, background: "transparent", color: "inherit", cursor: "pointer" }),
-      }, "Cancel"),
+      }, "取消"),
       error ? h("span", { key: "e", style: { color: "#dc2626", wordBreak: "break-word" } }, error) : null,
     ]);
 
@@ -1120,19 +1120,19 @@ function createClientPluginBody(React) {
               display: "inline-flex", alignItems: "center", gap: 5, borderRadius: 999,
               padding: "1px 8px", fontSize: 11, fontWeight: 700,
               background: "rgba(59,130,246,.16)", color: "#3b82f6",
-            } }, [HourglassIcon(12), h("span", { key: "t" }, "Scheduling…")]))
+            } }, [HourglassIcon(12), h("span", { key: "t" }, "正在定时…")]))
         : null,
       h("button", {
         key: "alarm", type: "button", className: "dsl-btn", onClick: open ? () => setOpen(false) : openPopover,
-        title: "Schedule send", "aria-label": "Schedule send", "aria-expanded": open, style: btnStyle,
-      }, [StopwatchIcon(14, open ? "spin" : ""), h("span", { key: "l" }, "Schedule")]),
+        title: "定时发送", "aria-label": "定时发送", "aria-expanded": open, style: btnStyle,
+      }, [StopwatchIcon(14, open ? "spin" : ""), h("span", { key: "l" }, "定时")]),
       open
         ? h("div", {
-            key: "pop", className: "dsl-pop dsl-motion", style: shell, role: "dialog", "aria-label": "Schedule send",
+            key: "pop", className: "dsl-pop dsl-motion", style: shell, role: "dialog", "aria-label": "定时发送",
             "data-send-at": timeValue, "data-layout": layout,
             onKeyDown: (e) => { if (e.key === "Escape") setOpen(false); },
           }, [
-            h(SkyBand, { key: "sky", ms: at, title: "Schedule send" }),
+            h(SkyBand, { key: "sky", ms: at, title: "定时发送" }),
             h("div", { key: "body", style: { display: "flex", flexDirection: side ? "row" : "column", alignItems: "stretch" } }, [main, extension]),
           ])
         : null,
@@ -1152,7 +1152,7 @@ function createClientPluginBody(React) {
     const core = props.core;
     const [, setTick] = React.useState(0);
     const mobile = isMobile();
-    // The pending "Cancel this message?" for the chip's ✕.
+    // The pending "取消这条消息？" for the chip's ✕.
     const [ask, setAsk] = React.useState(null);
     React.useEffect(() => {
       if (!ask || typeof document === "undefined" || !document.addEventListener) return undefined;
@@ -1215,14 +1215,14 @@ function createClientPluginBody(React) {
         ? h("div", {
             key: "err",
             style: { maxWidth: "48rem", margin: "0 auto", padding: "3px 8px", borderRadius: 8, background: "rgba(220,38,38,.10)", color: "#dc2626", wordBreak: "break-word", fontSize: 12 },
-          }, "⚠ Could not refresh — showing the last list: " + err)
+          }, "⚠ 刷新失败——显示的是上一次的列表：" + err)
         : null,
       t
         ? h("div", {
             key: "chip", "data-plugin": "dsh-schedule-later-chip", "data-task": t.id,
             className: sky.className,
             onClick: () => requestPanelOpen(t.id),
-            title: "Open the Scheduled panel with this message",
+            title: "在定时面板中打开这条消息",
             style: {
               display: "flex", alignItems: "center", gap: 8,
               width: "calc(100% - var(--dsh-composer-side-clearance, 16px) * 2 - var(--dsh-composer-dock-inset, 8px) * 4)",
@@ -1241,7 +1241,7 @@ function createClientPluginBody(React) {
             }, t.content || "(empty)"),
             extra > 0
               ? h("span", {
-                  key: "more", "data-chip-more": String(extra), title: extra + " more scheduled in this chat",
+                  key: "more", "data-chip-more": String(extra), title: extra + " 条排定中的消息",
                   style: { flex: "none", fontSize: 11, fontWeight: 700, padding: "0 7px", borderRadius: 999, background: "rgba(59,130,246,.16)", border: "1px solid rgba(59,130,246,.35)" },
                 }, "+" + extra)
               : null,
@@ -1251,7 +1251,7 @@ function createClientPluginBody(React) {
               style: { color: "#3b82f6", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4, flex: "none" },
             }, [HourglassIcon(11), h("span", { key: "t" }, mobile ? formatCountdown(t.sendAt, now) : sendsIn(t.sendAt, now))]),
             h("button", {
-              key: "x", type: "button", "aria-label": "Cancel this scheduled message", title: "Cancel this scheduled message",
+              key: "x", type: "button", "aria-label": "取消这条定时消息", title: "取消这条定时消息",
               onClick: (e) => {
                 e.stopPropagation();
                 setAsk({ ...askFor("cancel", t, ""), onConfirm: () => { core.cancelTask(t.id); } });
@@ -1270,7 +1270,7 @@ function createClientPluginBody(React) {
     ]);
   }
 
-  /* --- sidebar footer "Scheduled" panel (0.3.0) ------------------------------- */
+  /* --- sidebar footer "已定时" panel (0.3.0) ------------------------------- */
   function ScheduledTasksPanel(props) {
     const core = props.panelCore;
     const [open, setOpen] = React.useState(false);
@@ -1289,8 +1289,8 @@ function createClientPluginBody(React) {
     // viz tab, say) never reaches this document; it shows up as the window
     // losing focus to that iframe, so that closes it too.
     const rootRef = React.useRef(null);
-    // Row actions: which row is being re-timed, which "Send now" is armed
-    // (a second click sends), which chat's "Cancel all" is asking.
+    // Row actions: which row is being re-timed, which "立即发送" is armed
+    // (a second click sends), which chat's "全部取消" is asking.
     const [edit, setEdit] = React.useState(null); // { id, value, error }
     // The confirmation being asked: { title, note, preview, confirmLabel, danger, onConfirm }.
     const [ask, setAskState] = React.useState(null);
@@ -1456,7 +1456,7 @@ function createClientPluginBody(React) {
         padding: "0 8px", fontSize: 11, background: "transparent", color: "inherit", flexShrink: 0,
         ...(mobile ? { minHeight: TOUCH_MIN, boxSizing: "border-box" } : {}),
       },
-    }, "Cancel");
+    }, "取消");
 
     const stop = (e) => { if (e && typeof e.stopPropagation === "function") e.stopPropagation(); };
     const smallBtn = (key, label, onClick, extra) => h("button", {
@@ -1496,13 +1496,13 @@ function createClientPluginBody(React) {
       return groups;
     }
 
-    /** "Cancel all" for one chat, through the confirmation dialog. */
+    /** "全部取消" for one chat, through the confirmation dialog. */
     function cancelAllCtl(g) {
-      return smallBtn("ca", "Cancel all", () => setAsk({
-        title: "Cancel all " + g.tasks.length + " scheduled messages?",
-        note: "None of them will be sent" + (g.exists ? " to \u201c" + g.title + "\u201d" : "") + ". This can\u2019t be undone.",
+      return smallBtn("ca", "全部取消", () => setAsk({
+        title: "全部取消 " + g.tasks.length + " scheduled messages?",
+        note: "它们都不会被发送" + (g.exists ? "，发送到“" + g.title + "”" : "") + "。此操作无法撤销。",
         preview: g.tasks.map((t) => "\u2022 " + String(t.content).split(/\r?\n/, 1)[0]).join("\n"),
-        confirmLabel: "Cancel " + g.tasks.length + " messages", keepLabel: "Keep them", danger: true,
+        confirmLabel: "取消 " + g.tasks.length + " messages", keepLabel: "保留它们", danger: true,
         onConfirm: () => {
           if (g.tasks.some((t) => t.id === detailRef.current)) setDetail(null);
           for (const t of g.tasks) core.cancelTask(t.id).catch(() => {});
@@ -1517,7 +1517,7 @@ function createClientPluginBody(React) {
       let prev = null;
       for (const t of g.tasks) {
         const day = shortDay(t.sendAt, nowMs);
-        if (day !== prev && (prev !== null || day !== "Today")) {
+        if (day !== prev && (prev !== null || day !== "今天")) {
           out.push(h("div", {
             key: "d:" + t.id, "data-day": day,
             style: { fontSize: 10.5, fontWeight: 700, letterSpacing: ".4px", textTransform: "uppercase", opacity: .55, margin: "6px 2px 3px" },
@@ -1532,7 +1532,7 @@ function createClientPluginBody(React) {
     const saveEdit = (t) => {
       const at = edit ? new Date(edit.value).getTime() : NaN;
       if (!Number.isFinite(at) || at <= Date.now()) {
-        setEdit({ ...edit, error: "Pick a time in the future." });
+        setEdit({ ...edit, error: "请选择未来的时间。" });
         return;
       }
       setEdit(null);
@@ -1542,7 +1542,7 @@ function createClientPluginBody(React) {
     function editRow(t) {
       return h("div", { key: "e", onClick: stop, style: { display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" } }, [
         h("input", {
-          key: "i", type: "datetime-local", value: edit.value, "aria-label": "New send time",
+          key: "i", type: "datetime-local", value: edit.value, "aria-label": "新的发送时间",
           min: toLocalInput(Date.now() + 60_000),
           onChange: (e) => { setEdit({ ...edit, id: t.id, value: e.target.value, error: null }); setTick((n) => n + 1); },
           onKeyDown: (e) => {
@@ -1555,8 +1555,8 @@ function createClientPluginBody(React) {
             background: "transparent", color: "inherit", colorScheme: isDark ? "dark" : "light", minWidth: 0,
           },
         }),
-        smallBtn("sv", "Save", () => saveEdit(t), { border: "none", background: "#3b82f6", color: "#fff", fontWeight: 700 }),
-        smallBtn("bk", "Back", () => setEdit(null)),
+        smallBtn("sv", "保存", () => saveEdit(t), { border: "none", background: "#3b82f6", color: "#fff", fontWeight: 700 }),
+        smallBtn("bk", "返回", () => setEdit(null)),
         edit.error ? h("span", { key: "er", style: { color: "#dc2626", width: "100%" } }, edit.error) : null,
       ]);
     }
@@ -1592,25 +1592,25 @@ function createClientPluginBody(React) {
               h("span", { key: "cd", style: { color: "#3b82f6", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4, minWidth: 0, overflow: "hidden", whiteSpace: "nowrap" } },
                 [HourglassIcon(11), h("span", { key: "t" }, sendsIn(t.sendAt, nowMs))]),
               h("span", { key: "sp", style: { marginLeft: "auto", display: "inline-flex", alignItems: "center", gap: 2, flex: "none" } }, [
-                iconBtn("sn", "Send now", SendGlyph(13), () => { setEdit(null); confirmSend(t); }),
-                iconBtn("ed", "Change time", ClockGlyph(13), () => setEdit({ id: t.id, value: toLocalInput(t.sendAt), error: null, where: "row" })),
+                iconBtn("sn", "立即发送", SendGlyph(13), () => { setEdit(null); confirmSend(t); }),
+                iconBtn("ed", "修改时间", ClockGlyph(13), () => setEdit({ id: t.id, value: toLocalInput(t.sendAt), error: null, where: "row" })),
                 cancelBtn(t),
               ]),
             ]),
       ]);
     }
 
-    /** "Saturday 27 September 2026, 2:35 AM" in the browser's locale. */
+    /** "2026年9月27日 星期六 上午2:35" in the browser's locale. */
     const longWhen = (ms) => new Date(ms).toLocaleString(undefined, {
       weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "2-digit",
     });
     const ago = (ms) => {
       const m = Math.round((Date.now() - ms) / 60_000);
       if (!Number.isFinite(m)) return "";
-      if (m < 1) return "just now";
-      if (m < 60) return m + " min ago";
+      if (m < 1) return "刚刚";
+      if (m < 60) return m + " 分钟前";
       const hrs = Math.round(m / 60);
-      return hrs < 48 ? hrs + " h ago" : Math.round(hrs / 24) + " days ago";
+      return hrs < 48 ? hrs + " 小时前" : Math.round(hrs / 24) + " 天前";
     };
 
     /* --- per-message model selection: dsh's own catalog ------------------- */
@@ -1628,7 +1628,7 @@ function createClientPluginBody(React) {
       return (m?.reasoning?.efforts || []).find((e) => e.id === sel.reasoningEffort)?.name || sel.reasoningEffort;
     };
     // What the chat itself currently runs on (unknown for a chat that is not
-    // open in this browser — then the card just says "Chat default").
+    // open in this browser — then the card just says "跟随对话默认").
     const chatSelection = (t) => {
       try { return props.currentSelection?.(t.conversationId) || undefined; } catch { return undefined; }
     };
@@ -1674,16 +1674,16 @@ function createClientPluginBody(React) {
           key: "def", "data-model-choice": "chat-default", onClick: () => chooseModel(t, null),
           style: { ...row, fontWeight: isSame(null) ? 700 : 400 },
         }, [
-          h("span", { key: "n", style: { minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "Chat default"),
+          h("span", { key: "n", style: { minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, "跟随对话默认"),
           chatSelection(t)
             ? h("span", { key: "c", style: { marginLeft: "auto", opacity: .55, whiteSpace: "nowrap" } }, modelLabel(chatSelection(t)))
             : null,
         ]),
       ];
       if (catalog.status === "loading") {
-        kids.push(h("div", { key: "ld", style: { padding: "6px 8px", opacity: .6 } }, "Loading models…"));
+        kids.push(h("div", { key: "ld", style: { padding: "6px 8px", opacity: .6 } }, "正在加载模型…"));
       } else if (catalog.status === "error") {
-        kids.push(h("div", { key: "er", style: { padding: "6px 8px", color: "#dc2626" } }, "Could not load the model list: " + (catalog.error || "unknown error")));
+        kids.push(h("div", { key: "er", style: { padding: "6px 8px", color: "#dc2626" } }, "无法加载模型列表：" + (catalog.error || "未知错误")));
       } else {
         for (const g of (catalog.value?.groups || [])) {
           kids.push(h("div", {
@@ -1746,7 +1746,7 @@ function createClientPluginBody(React) {
         } catch { /* no clipboard: nothing to do */ }
       };
       return h("div", {
-        key: "detail", "data-plugin": "dsh-schedule-later-detail", role: "dialog", "aria-label": "Scheduled message details",
+        key: "detail", "data-plugin": "dsh-schedule-later-detail", role: "dialog", "aria-label": "定时消息详情",
         className: "dsl-pop",
         onClick: stop,
         style: {
@@ -1764,7 +1764,7 @@ function createClientPluginBody(React) {
           whenPill(t.sendAt, nowMs, isDark),
           h("span", { key: "cd", style: { color: "#3b82f6", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 } }, [HourglassIcon(11), h("span", { key: "t" }, sendsIn(t.sendAt, nowMs))]),
           h("button", {
-            key: "x", type: "button", "aria-label": "Close details", onClick: (e) => { stop(e); setDetail(null); setEdit(null); setTick((n) => n + 1); },
+            key: "x", type: "button", "aria-label": "关闭详情", onClick: (e) => { stop(e); setDetail(null); setEdit(null); setTick((n) => n + 1); },
             style: { cursor: "pointer", marginLeft: "auto", border: "none", background: "transparent", color: "inherit", fontSize: 14, lineHeight: 1 },
           }, "✕"),
         ]),
@@ -1776,18 +1776,18 @@ function createClientPluginBody(React) {
                 padding: "0 7px", borderRadius: 999, fontSize: 11, fontWeight: 700, lineHeight: "18px",
                 background: byAssistant ? "rgba(168,85,247,.18)" : "rgba(59,130,246,.16)", color: byAssistant ? "#c084fc" : "#60a5fa",
               },
-            }, byAssistant ? "Scheduled by the assistant" : "Scheduled by you"),
+            }, byAssistant ? "由助手定时发送" : "由你定时发送"),
             t.createdAt ? h("span", { key: "c", title: formatLocalTime(t.createdAt) }, ago(t.createdAt)) : null,
           ]),
 
           label("lc", "Chat"),
           h("div", { key: "chat", style: { display: "flex", alignItems: "center", gap: 8, minWidth: 0 } }, [
             h("span", { key: "t", style: { fontWeight: 600, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", opacity: t.sessionExists ? 1 : .6 } },
-              t.sessionExists ? t.sessionTitle : "Chat no longer exists"),
-            t.sessionExists ? smallBtn("open", "Open chat", () => jump(t), { marginLeft: "auto" }) : null,
+              t.sessionExists ? t.sessionTitle : "对话已不存在"),
+            t.sessionExists ? smallBtn("open", "打开对话", () => jump(t), { marginLeft: "auto" }) : null,
           ]),
 
-          label("md", "Model"),
+          label("md", "模型"),
           h("div", { key: "model", style: { display: "flex", alignItems: "center", gap: 8, minWidth: 0, flexWrap: "wrap" } }, [
             t.model
               ? h("span", {
@@ -1801,15 +1801,15 @@ function createClientPluginBody(React) {
                     : null,
                 ])
               : h("span", { key: "v", "data-model-value": "chat-default", style: { opacity: .75 } },
-                  chatSelection(t) ? "Chat default · " + modelLabel(chatSelection(t)) : "Chat default (this chat's model)"),
-            smallBtn("ch", modelPicker === t.id ? "Close" : "Change", () => togglePicker(t), { marginLeft: "auto" }),
+                  chatSelection(t) ? "跟随对话默认 · " + modelLabel(chatSelection(t)) : "跟随对话默认（本对话的模型）"),
+            smallBtn("ch", modelPicker === t.id ? "关闭" : "修改", () => togglePicker(t), { marginLeft: "auto" }),
           ]),
           modelPicker === t.id ? modelPickerNode(t) : null,
 
           h("div", { key: "lm", style: { display: "flex", alignItems: "center", margin: "10px 0 4px" } }, [
-            h("span", { key: "l", style: { fontSize: 10.5, fontWeight: 700, letterSpacing: ".4px", textTransform: "uppercase", opacity: .55 } }, "Message"),
+            h("span", { key: "l", style: { fontSize: 10.5, fontWeight: 700, letterSpacing: ".4px", textTransform: "uppercase", opacity: .55 } }, "消息"),
             h("span", { key: "n", style: { opacity: .45, marginLeft: 6 } }, t.content.length.toLocaleString() + " chars"),
-            smallBtn("cp", copied ? "Copied" : "Copy", copy, { marginLeft: "auto" }),
+            smallBtn("cp", copied ? "已复制" : "复制", copy, { marginLeft: "auto" }),
           ]),
           h("pre", {
             key: "msg", "data-detail-content": "", className: "dsl-dock-list",
@@ -1821,15 +1821,15 @@ function createClientPluginBody(React) {
             },
           }, t.content),
           byAssistant
-            ? h("div", { key: "mk", style: { marginTop: 6, opacity: .6 } }, "It arrives starting with [Scheduled by the assistant], so it is never mistaken for you typing.")
+            ? h("div", { key: "mk", style: { marginTop: 6, opacity: .6 } }, "送达的消息以 [由助手定时发送] 开头，不会被误认为是你本人发的。")
             : null,
           t.attempts > 0 || t.lastError
             ? h("div", { key: "err", style: { marginTop: 8, padding: "6px 8px", borderRadius: 8, background: "rgba(245,158,11,.12)", color: isDark ? "#fcd34d" : "#b45309", wordBreak: "break-word" } },
-                "Delivery tried " + (t.attempts || 0) + " time" + (t.attempts === 1 ? "" : "s") + (t.lastError ? " — last error: " + t.lastError : "") + ". It will try again.")
+                "已尝试投递 " + (t.attempts || 0) + " 次" + (t.lastError ? "——最近一次错误：" + t.lastError : "") + "。稍后会自动重试。")
             : null,
           t.waitingForChat
             ? h("div", { key: "wait", "data-waiting-for-chat": "", style: { marginTop: 8, padding: "6px 8px", borderRadius: 8, background: "rgba(59,130,246,.12)", color: isDark ? "#93c5fd" : "#1d4ed8" } },
-                "This chat is not live right now. The message stays queued and sends by itself as soon as the chat can be resumed — you do not need to open it.")
+                "这个对话当前不在线。消息会留在队列里，等对话可以恢复时会自动发出——你不需要手动打开它。")
             : null,
         ]),
 
@@ -1838,9 +1838,9 @@ function createClientPluginBody(React) {
           editingHere
             ? [editRow(t)]
             : [
-                smallBtn("sn", "Send now", () => confirmSend(t)),
-                smallBtn("ed", "Change time", () => setEdit({ id: t.id, value: toLocalInput(t.sendAt), error: null, where: "detail" })),
-                smallBtn("cx", "Cancel message", () => confirmCancel(t),
+                smallBtn("sn", "立即发送", () => confirmSend(t)),
+                smallBtn("ed", "修改时间", () => setEdit({ id: t.id, value: toLocalInput(t.sendAt), error: null, where: "detail" })),
+                smallBtn("cx", "取消消息", () => confirmCancel(t),
                   { marginLeft: "auto", color: "#ef4444", borderColor: "rgba(239,68,68,.45)" }),
               ]),
       ]);
@@ -1864,7 +1864,7 @@ function createClientPluginBody(React) {
           h("div", {
             key: "head", style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 6 },
           }, [
-            h("span", { key: "t", style: { fontWeight: 700, fontSize: 13, display: "inline-flex", alignItems: "center", gap: 6 } }, [StopwatchIcon(14), h("span", { key: "l" }, "Scheduled")]),
+            h("span", { key: "t", style: { fontWeight: 700, fontSize: 13, display: "inline-flex", alignItems: "center", gap: 6 } }, [StopwatchIcon(14), h("span", { key: "l" }, "已定时")]),
             h("span", { key: "n", style: { opacity: .6 } }, all.length ? `${all.length} pending` : ""),
             h("button", {
               key: "close", type: "button", onClick: () => setOpen(false),
@@ -1875,12 +1875,12 @@ function createClientPluginBody(React) {
             ? h("div", {
                 key: "err",
                 style: { padding: "3px 8px", borderRadius: 8, background: "rgba(220,38,38,.10)", color: "#dc2626", wordBreak: "break-word" },
-              }, "⚠ Could not refresh — showing the last list: " + err)
+              }, "⚠ 刷新失败——显示的是上一次的列表：" + err)
             : null,
           !all.length && !err
             ? h("div", { key: "empty", style: { padding: "18px 0", textAlign: "center", opacity: .6 } }, [
-                h("div", { key: "l1" }, "No scheduled messages"),
-                h("div", { key: "l2", style: { marginTop: 4 } }, "Click Schedule in a chat's message box to create one"),
+                h("div", { key: "l1" }, "没有定时消息"),
+                h("div", { key: "l2", style: { marginTop: 4 } }, "在对话输入框点「定时」即可创建"),
               ])
             : null,
           groupByChat(annotated).map((g) => h("div", { key: "g:" + g.key, "data-group": g.key, style: { marginBottom: 6 } }, [
@@ -1888,13 +1888,13 @@ function createClientPluginBody(React) {
               h("button", {
                 key: "t", type: "button",
                 onClick: () => { if (g.exists) jump(g.tasks[0]); },
-                title: g.exists ? "Open this chat" : "Chat no longer exists — its messages can only be cancelled",
+                title: g.exists ? "打开这个对话" : "对话已不存在——其中的消息只能取消",
                 style: {
                   cursor: g.exists ? "pointer" : "default", border: "none", background: "transparent", color: "inherit",
                   padding: 0, font: "inherit", fontWeight: 700, textAlign: "left", opacity: g.exists ? 1 : .6,
                   minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                 },
-              }, g.exists ? g.title : "Chat no longer exists"),
+              }, g.exists ? g.title : "对话已不存在"),
               h("span", { key: "n", style: { opacity: .5, flex: "none" } }, String(g.tasks.length)),
               g.tasks.length > 1 ? cancelAllCtl(g) : null,
             ]),
@@ -1916,8 +1916,8 @@ function createClientPluginBody(React) {
         hoverCss,
         h("button", {
           key: "btn", type: "button", className: "ssb_badge", onClick: toggle,
-          title: all.length ? `Scheduled messages (${all.length})` : "Scheduled messages",
-          "aria-label": "Scheduled messages", style: collapsedBtn,
+          title: all.length ? `Scheduled messages (${all.length})` : "定时消息",
+          "aria-label": "定时消息", style: collapsedBtn,
         }, [
           h("span", { key: "i", style: iconBox }, StopwatchIcon(16, all.length ? "slow" : "")),
           all.length
@@ -1942,11 +1942,11 @@ function createClientPluginBody(React) {
         key: "btn", type: "button",
         className: "ssb_badge",
         onClick: toggle,
-        title: "Scheduled messages", "aria-label": "Scheduled messages", style: entryBtn,
+        title: "定时消息", "aria-label": "定时消息", style: entryBtn,
       }, [
         // ticks slowly while anything is waiting to be sent
         h("span", { key: "i", style: iconBox }, StopwatchIcon(16, all.length ? "slow" : "")),
-        h("span", { key: "l", style: labelStyle }, "Scheduled"),
+        h("span", { key: "l", style: labelStyle }, "已定时"),
         all.length ? badge(all.length) : null,
       ]),
       footer,
@@ -2083,7 +2083,7 @@ function createClientPluginBody(React) {
         const modelCatalog = async () => {
           const response = await modelScope?.remote?.session?.modelCatalog?.();
           if (!response || !response.ok) {
-            throw new Error(response?.error ? response.error.code + ": " + response.error.message : "model catalog unavailable");
+            throw new Error(response?.error ? response.error.code + ": " + response.error.message : "模型列表不可用");
           }
           return response.value;
         };
